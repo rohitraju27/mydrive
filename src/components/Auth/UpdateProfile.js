@@ -3,14 +3,17 @@ import { Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import CenteredContainer from './CenteredContainer';
+import Login from './Login';
 
 const UpdateProfile = () => {
     const emailRef = useRef();
     const passwordRef = useRef();
     const passwordConfirmRef = useRef();
-    const { currentUser, updateEmail, updatePassword } = useAuth();
+    const nameRef = useRef();
+    const { currentUser, updateEmail, updatePassword, updateName, logout } = useAuth();
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
     const history = useHistory();
 
 
@@ -23,16 +26,24 @@ const UpdateProfile = () => {
         const promises = []
         setLoading(true);
         setError('');
+        setMessage('');
         if (emailRef.current.value !== currentUser.email) {
             promises.push(updateEmail(emailRef.current.value));
+            setMessage('To view changes please login again.');
         }
 
         if (passwordRef.current.value) {
             promises.push(updatePassword(passwordRef.current.value));
+            setMessage('To view changes please login again.');
+        }
+
+        if (nameRef.current.value !== currentUser.displayName) {
+            promises.push(updateName(nameRef.current.value));
+            setMessage('To view changes please login again.');
         }
 
         Promise.all(promises).then(() => {
-            history.push('/user');
+            logout();
         }).catch((error) => {
             setError(error.message);
         }).finally(() => {
@@ -45,8 +56,13 @@ const UpdateProfile = () => {
             <Card>
                 <Card.Body>
                     <h2 className="text-center mb-4">Update Profile</h2>
+                    {message && <Alert variant="success">{message}</Alert>}
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Form onSubmit={handleSubmit}>
+                        <Form.Group id="name">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control type="text" ref={nameRef} required defaultValue={currentUser.displayName} />
+                        </Form.Group>
                         <Form.Group id="email">
                             <Form.Label>Email</Form.Label>
                             <Form.Control type="email" ref={emailRef} required defaultValue={currentUser.email} />
