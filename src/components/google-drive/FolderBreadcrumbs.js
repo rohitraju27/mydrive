@@ -1,9 +1,10 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem } from 'react-bootstrap';
+import NavbarCollapse from 'react-bootstrap/esm/NavbarCollapse';
 import { Link } from 'react-router-dom';
 import { ROOT_FOLDER } from '../hooks/useFolder';
 
-const FolderBreadcrumbs = ({ currentFolder }) => {
+const FolderBreadcrumbs = ({ currentFolder, childFolders }) => {
     let path = currentFolder === ROOT_FOLDER ? [] : [ROOT_FOLDER];
     if (currentFolder) path = [...path, ...currentFolder.path];
 
@@ -26,9 +27,15 @@ const FolderBreadcrumbs = ({ currentFolder }) => {
                 </Breadcrumb.Item>
             ))}
             {currentFolder && (
-                <Breadcrumb.Item className="text-truncate d-inline-block" style={{ maxWidth: '200px' }} active>
-                    {currentFolder.name}
-                </Breadcrumb.Item>
+                <>
+                    <Breadcrumb.Item
+                        className="text-truncate d-inline-block"
+                        style={{ maxWidth: '200px' }}
+                        active
+                    >
+                        {currentFolder.name}
+                    </Breadcrumb.Item>
+                </>
             )}
         </Breadcrumb>
     )
